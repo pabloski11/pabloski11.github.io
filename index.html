@@ -1,203 +1,805 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analizador Institucional de Mercados IA</title>
 
-<title>Cómo Mejorar Tu Economía | Guía Profesional</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-<style>
+    body {
+      background: url('bg.png') no-repeat center center fixed;
+      background-size: cover;
 
-body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: #f5f7fb;
-}
+      background: #050816;
+      color: white;
+      font-family: Arial, sans-serif;
+      overflow-x: hidden;
+    }
 
-/* HEADER */
-header {
-    background: linear-gradient(135deg, #000, #222);
-    color: white;
-    text-align: center;
-    padding: 60px 20px;
-}
+    .glass {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+    }
 
-header h1 {
-    font-family: 'Montserrat';
-    font-size: 3rem;
-}
+    .glow {
+      box-shadow: 0 0 25px rgba(59,130,246,0.35);
+    }
 
-/* CONTENEDOR */
-.container {
-    max-width: 1100px;
-    margin: auto;
-    padding: 20px;
-}
+    .buy {
+      color: #00ff99;
+    }
 
-/* TARJETAS */
-.card {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    margin: 30px 0;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
+    .sell {
+      color: #ff4d4d;
+    }
 
-/* TITULOS */
-h2 {
-    font-family: 'Montserrat';
-    font-size: 2rem;
-}
+    .neutral {
+      color: #ffd966;
+    }
 
-/* IMAGENES */
-img {
-    width: 100%;
-    height: 350px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin: 15px 0;
-}
+    iframe {
+      width: 100%;
+      border: none;
+      border-radius: 20px;
+      background: #050816;
+    }
 
-/* ANUNCIOS */
-.ad {
-    background: #e9ecef;
-    padding: 25px;
-    text-align: center;
-    margin: 30px 0;
-    border-radius: 10px;
-}
+    .pulse {
+      animation: pulse 2s infinite;
+    }
 
-footer {
-    background: #111;
-    color: white;
-    text-align: center;
-    padding: 30px;
-}
+    @keyframes pulse {
+      0% {
+        opacity: 1;
+      }
 
-</style>
+      50% {
+        opacity: 0.6;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+  </style>
 </head>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7907962120851166"
-     crossorigin="anonymous"></script>
 <body>
 
-<header>
-<h1>💰 MEJORA TU ECONOMÍA COMO UN EXPERTO</h1>
-<p>Guía completa para ganar más dinero, ahorrar e invertir correctamente</p>
-</header>
+<div id="welcomeScreen" class="fixed inset-0 z-50 bg-[#050816] flex items-center justify-center p-6">
 
-<div class="container">
+  <div class="max-w-6xl w-full">
 
-<div class="card">
-<h2>🔥 1. CONTROLA TUS GASTOS COMO UN PROFESIONAL</h2>
-<img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&q=80">
+    <div class="text-center mb-14">
+      <h1 class="text-7xl font-black mb-6 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+        TERMINAL INSTITUCIONAL IA
+      </h1>
 
-<p>El control de gastos es la base de cualquier estrategia financiera. Sin este paso, todo lo demás falla. Muchas personas creen que no pueden ahorrar, pero en realidad nunca han analizado sus hábitos de consumo.</p>
+      <p class="text-2xl text-gray-400 max-w-4xl mx-auto leading-10">
+        Plataforma profesional de análisis financiero, inteligencia artificial y trading institucional en tiempo real.
+      </p>
+    </div>
 
-<p>Registrar cada gasto te permite detectar fugas de dinero invisibles: suscripciones, compras impulsivas o gastos diarios acumulativos. Este análisis es clave para tomar decisiones inteligentes.</p>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-<p>Un truco profesional es dividir tus gastos en fijos, variables y discrecionales. Esto te permite identificar qué puedes reducir sin afectar tu calidad de vida.</p>
+      <div onclick="openTerminal()" class="glass rounded-3xl p-10 cursor-pointer hover:scale-[1.02] transition-all glow border border-cyan-500/30">
 
-<p>Cuanto más consciente eres de tus gastos, más control tienes sobre tu futuro financiero.</p>
+        <div class="mb-6 text-cyan-400 text-6xl"></div>
 
-<p>Además, es recomendable realizar un análisis semanal de tus movimientos bancarios. Esto te permitirá detectar errores, cargos innecesarios o incluso fraudes.</p>
+        <h2 class="text-4xl font-black mb-5">
+          Terminal Profesional
+        </h2>
 
-<p>Otro consejo clave es establecer límites de gasto mensuales por categoría, lo que crea disciplina financiera.</p>
-</div>
+        <p class="text-gray-400 text-lg leading-8 mb-8">
+          Analiza criptomonedas, forex, índices, acciones y materias primas con gráficos profesionales, indicadores técnicos y señales automáticas.
+        </p>
 
-<div class="ad">💰 ANUNCIO ADSENSE</div>
+        <div class="space-y-3 text-lg">
+          <div>✅ Gráficos de velas</div>
+          <div>✅ RSI + MACD</div>
+          <div>✅ IA predictiva</div>
+          <div>✅ Señales de compra y venta</div>
+          <div>✅ Multi mercado</div>
+        </div>
 
-<div class="card">
-<h2>💰 2. CREA UN SISTEMA DE PRESUPUESTO EFICIENTE</h2>
-<img src="https://images.unsplash.com/photo-1586486855514-8c633cc6fd38?auto=format&fit=crop&w=1200&q=80">
+      </div>
 
-<p>Un presupuesto no es una limitación, es una herramienta de poder. Te permite dirigir tu dinero en lugar de perderlo sin control.</p>
+      <div onclick="openAITrading()" class="glass rounded-3xl p-10 cursor-pointer hover:scale-[1.02] transition-all glow border border-purple-500/30">
 
-<p>Los expertos recomiendan la regla 50/30/20, pero lo importante es adaptarla a tu realidad. Lo clave es que siempre haya ahorro.</p>
+        <div class="mb-6 text-purple-400 text-6xl"></div>
 
-<p>Un sistema profesional incluye seguimiento semanal, revisión mensual y ajustes constantes.</p>
+        <h2 class="text-4xl font-black mb-5">
+          IA Experta en Trading
+        </h2>
 
-<p>Cuando dominas tu presupuesto, eliminas el estrés financiero y ganas tranquilidad mental.</p>
+        <p class="text-gray-400 text-lg leading-8 mb-8">
+          Pregunta cualquier cosa sobre trading, mercados financieros, análisis técnico o estrategias y recibe respuestas profesionales en tiempo real.
+        </p>
 
-<p>También es importante definir objetivos financieros claros como comprar una casa o invertir.</p>
+        <div class="space-y-3 text-lg">
+          <div>✅ IA especializada</div>
+          <div>✅ Datos en tiempo real</div>
+          <div>✅ Estrategias profesionales</div>
+          <div>✅ Análisis institucional</div>
+          <div>✅ Soporte multi activos</div>
+        </div>
 
-<p>Automatizar el ahorro es una de las mejores estrategias para asegurar resultados a largo plazo.</p>
-</div>
+      </div>
 
-<div class="card">
-<h2>💡 3. CREA MÚLTIPLES FUENTES DE INGRESO</h2>
-<img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80">
+    </div>
 
-<p>Depender de un solo ingreso es uno de los mayores riesgos financieros. Hoy en día, internet ofrece muchas oportunidades.</p>
-
-<p>Puedes empezar con freelancing, vender productos digitales o aprender habilidades digitales.</p>
-
-<p>El objetivo es construir ingresos que no dependan totalmente de tu tiempo.</p>
-
-<p>Los ingresos múltiples son la base de la libertad financiera moderna.</p>
-
-<p>Invertir en formación puede aumentar significativamente tus ingresos en poco tiempo.</p>
-
-<p>Crear proyectos paralelos puede generar ingresos pasivos en el futuro.</p>
-</div>
-
-<div class="ad">💰 ANUNCIO ADSENSE</div>
-
-<div class="card">
-<h2>🛑 4. ELIMINA DEUDAS RÁPIDAMENTE</h2>
-<img src="https://images.unsplash.com/photo-1601597111158-2fceff292cdc?auto=format&fit=crop&w=1200&q=80">
-
-<p>Las deudas con intereses altos pueden destruir tu economía. Eliminarlas es una prioridad.</p>
-
-<p>El método avalancha consiste en pagar primero las deudas más caras.</p>
-
-<p>También es importante cambiar hábitos para no volver a endeudarte.</p>
-
-<p>Eliminar deudas es clave para tu libertad financiera.</p>
-
-<p>Evita el uso excesivo de tarjetas de crédito y crea un plan de pago claro.</p>
-
-<p>Cuanto antes elimines deudas, antes podrás invertir.</p>
-</div>
-
-<div class="card">
-<h2>📈 5. INVIERTE Y HAZ CRECER TU DINERO</h2>
-<img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80">
-
-<p>Invertir transforma tu dinero en crecimiento. Sin inversión, pierdes valor por inflación.</p>
-
-<p>Los fondos indexados son ideales para empezar.</p>
-
-<p>La clave es invertir cada mes sin fallar.</p>
-
-<p>El interés compuesto hará crecer tu dinero.</p>
-
-<p>Diversificar reduce riesgos.</p>
-
-<p>Invertir a largo plazo es más seguro.</p>
-</div>
-
-<div class="ad">💰 ANUNCIO ADSENSE</div>
-
-<div class="card">
-<h2>🏆 CONCLUSIÓN FINAL</h2>
-
-<p>Si aplicas estos 5 pasos, tu economía cambiará completamente.</p>
-
-<p>La clave es la constancia y la disciplina.</p>
-
-<p>Pequeñas acciones generan grandes resultados con el tiempo.</p>
-
-<p>La educación financiera es la mejor inversión que puedes hacer.</p>
+  </div>
 
 </div>
 
+<div id="aiTradingScreen" class="hidden min-h-screen p-6 bg-[#050816]">
+
+  <div class="max-w-7xl mx-auto">
+
+    <div class="flex justify-between items-center mb-10">
+
+      <div>
+        <h1 class="text-6xl font-black bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent mb-3">
+          IA EXPERTA EN TRADING
+        </h1>
+
+        <p class="text-gray-400 text-xl">
+          Asistente institucional avanzado para mercados financieros
+        </p>
+      </div>
+
+      <button onclick="backToHome()" class="bg-black/40 hover:bg-blue-600 px-6 py-3 rounded-2xl border border-white/10 transition-all">
+        Volver
+      </button>
+
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <div class="lg:col-span-2 glass rounded-3xl p-6">
+
+        <div id="chatMessages" class="h-[650px] overflow-y-auto space-y-6 mb-6 pr-2">
+
+          <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-5">
+            <p class="text-cyan-400 font-bold mb-2">IA Trading</p>
+            <p class="text-gray-300 leading-8">
+              Hola. Soy tu inteligencia artificial institucional especializada en trading y mercados financieros. Puedes preguntarme sobre criptomonedas, forex, acciones, análisis técnico, estrategias, riesgo, entradas, salidas o tendencias del mercado.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="flex gap-4">
+
+          <input
+            id="aiInput"
+            type="text"
+            placeholder="Pregunta cualquier cosa sobre trading..."
+            class="flex-1 bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none"
+          />
+
+          <button onclick="sendAIMessage()" class="bg-purple-600 hover:bg-purple-700 px-8 py-4 rounded-2xl font-bold transition-all glow">
+            Preguntar
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="glass rounded-3xl p-6">
+
+        <h2 class="text-3xl font-black mb-6">
+          Datos del Mercado
+        </h2>
+
+        <div class="space-y-5">
+
+          <div class="bg-black/30 rounded-2xl p-5">
+            <p class="text-gray-400 mb-2">Bitcoin</p>
+            <h3 class="text-3xl font-black buy">$108,245</h3>
+          </div>
+
+          <div class="bg-black/30 rounded-2xl p-5">
+            <p class="text-gray-400 mb-2">Ethereum</p>
+            <h3 class="text-3xl font-black buy">$5,820</h3>
+          </div>
+
+          <div class="bg-black/30 rounded-2xl p-5">
+            <p class="text-gray-400 mb-2">Sentimiento Global</p>
+            <h3 class="text-3xl font-black text-yellow-400">ALCISTA</h3>
+          </div>
+
+          <div class="bg-black/30 rounded-2xl p-5">
+            <p class="text-gray-400 mb-2">Volatilidad</p>
+            <h3 class="text-3xl font-black text-red-400">MEDIA</h3>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
 
-<footer>
-<p>© 2026 Finanzas PRO</p>
-</footer>
+<div id="terminalScreen" class="hidden">
+
+<div class="min-h-screen p-6">
+
+  <div class="flex flex-col lg:flex-row justify-between items-center gap-6 mb-10">
+
+    <div>
+      <h1 class="text-5xl font-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-3">
+        ANALIZADOR INSTITUCIONAL IA
+      </h1>
+
+      <p class="text-gray-400 text-lg">
+        Plataforma profesional de análisis financiero en tiempo real
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-4">
+
+      <select id="marketSelect" class="bg-black border border-gray-700 rounded-2xl px-5 py-3 text-white">
+        <option>BTCUSDT</option>
+        <option>ETHUSDT</option>
+        <option>SOLUSDT</option>
+        <option>XRPUSDT</option>
+        <option>ADAUSDT</option>
+        <option>BNBUSDT</option>
+        <option>DOGEUSDT</option>
+        <option>AVAXUSDT</option>
+        <option>LINKUSDT</option>
+        <option>EURUSD</option>
+        <option>GBPUSD</option>
+        <option>NASDAQ</option>
+        <option>SP500</option>
+        <option>ORO</option>
+        <option>AAPL</option>
+        <option>TSLA</option>
+        <option>NVDA</option>
+      </select>
+
+      <button onclick="analyzeMarket()" class="bg-blue-600 hover:bg-blue-700 transition-all px-7 py-3 rounded-2xl font-bold glow">
+        Analizar Mercado
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+
+    <div class="glass p-6 rounded-3xl">
+      <p class="text-gray-400 mb-2">Precio Actual</p>
+      <h2 id="price" class="text-4xl font-black">-</h2>
+    </div>
+
+    <div class="glass p-6 rounded-3xl">
+      <p class="text-gray-400 mb-2">Tendencia</p>
+      <h2 id="trend" class="text-4xl font-black">-</h2>
+    </div>
+
+    <div class="glass p-6 rounded-3xl">
+      <p class="text-gray-400 mb-2">Señal IA</p>
+      <h2 id="signal" class="text-4xl font-black pulse">-</h2>
+    </div>
+
+    <div class="glass p-6 rounded-3xl">
+      <p class="text-gray-400 mb-2">Riesgo</p>
+      <h2 id="risk" class="text-4xl font-black">-</h2>
+    </div>
+
+  </div>
+
+  <div class="glass p-6 rounded-3xl mb-8 glow">
+
+    <div class="flex flex-col lg:flex-row justify-between items-center gap-5 mb-5">
+
+      <h2 class="text-3xl font-bold">
+        Gráfico Profesional de Velas
+      </h2>
+
+      <div id="intervalButtons" class="flex gap-3 flex-wrap">
+        <button onclick="changeInterval('1', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">1 Min</button>
+
+        <button onclick="changeInterval('5', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">5 Min</button>
+
+        <button onclick="changeInterval('15', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">15 Min</button>
+
+        <button onclick="changeInterval('30', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">30 Min</button>
+
+        <button onclick="changeInterval('60', this)" class="interval-btn bg-blue-600 px-5 py-2 rounded-xl border border-blue-400 glow">1 Hora</button>
+
+        <button onclick="changeInterval('240', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">4 Horas</button>
+
+        <button onclick="changeInterval('D', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">1 Día</button>
+
+        <button onclick="changeInterval('W', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">1 Semana</button>
+      </div>
+
+    </div>
+
+    <div id="tradingview_widget" style="height:700px;width:100%;"></div>
+
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+    <div class="glass p-6 rounded-3xl">
+
+      <h2 class="text-2xl font-bold mb-5">Indicadores Técnicos</h2>
+
+      <div class="space-y-4">
+
+        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
+          <span>RSI</span>
+          <span id="rsi">-</span>
+        </div>
+
+        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
+          <span>MACD</span>
+          <span id="macd">-</span>
+        </div>
+
+        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
+          <span>EMA 20</span>
+          <span id="ema20">-</span>
+        </div>
+
+        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
+          <span>EMA 50</span>
+          <span id="ema50">-</span>
+        </div>
+
+        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
+          <span>Soporte</span>
+          <span id="support">-</span>
+        </div>
+
+        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
+          <span>Resistencia</span>
+          <span id="resistance">-</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="glass p-6 rounded-3xl">
+
+      <h2 class="text-2xl font-bold mb-5">Predicción IA</h2>
+
+      <div class="space-y-4">
+
+        <div class="bg-black/30 p-4 rounded-2xl">
+          <p class="text-gray-400 mb-2">Precio Predicho</p>
+          <h2 id="prediction" class="text-3xl font-black">-</h2>
+        </div>
+
+        <div class="bg-black/30 p-4 rounded-2xl">
+          <p class="text-gray-400 mb-2">Probabilidad</p>
+          <h2 id="probability" class="text-3xl font-black">-</h2>
+        </div>
+
+        <div class="bg-black/30 p-4 rounded-2xl">
+          <p class="text-gray-400 mb-2">Recomendación</p>
+          <h2 id="recommendation" class="text-xl font-bold">-</h2>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="glass p-6 rounded-3xl">
+
+      <h2 class="text-2xl font-bold mb-5">Sentimiento del Mercado</h2>
+
+      <div class="space-y-6">
+
+        <div>
+          <div class="flex justify-between mb-2">
+            <span>Miedo y Codicia</span>
+            <span>78</span>
+          </div>
+
+          <div class="w-full bg-black/40 h-4 rounded-full overflow-hidden">
+            <div class="bg-green-500 h-4 rounded-full" style="width:78%"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between mb-2">
+            <span>Probabilidad Alcista</span>
+            <span>82%</span>
+          </div>
+
+          <div class="w-full bg-black/40 h-4 rounded-full overflow-hidden">
+            <div class="bg-blue-500 h-4 rounded-full" style="width:82%"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between mb-2">
+            <span>Riesgo Global</span>
+            <span>34%</span>
+          </div>
+
+          <div class="w-full bg-black/40 h-4 rounded-full overflow-hidden">
+            <div class="bg-yellow-500 h-4 rounded-full" style="width:34%"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+    <div class="glass p-6 rounded-3xl">
+
+      <h2 class="text-2xl font-bold mb-5">Mercados Globales</h2>
+
+      <div class="space-y-4">
+
+        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
+          <span>Bitcoin</span>
+          <span class="buy">+2.4%</span>
+        </div>
+
+        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
+          <span>Ethereum</span>
+          <span class="buy">+1.8%</span>
+        </div>
+
+        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
+          <span>NASDAQ</span>
+          <span class="sell">-0.9%</span>
+        </div>
+
+        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
+          <span>Oro</span>
+          <span class="buy">+0.6%</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="glass p-6 rounded-3xl">
+
+      <h2 class="text-2xl font-bold mb-5">Análisis Profesional IA</h2>
+
+      <div id="aiAnalysis" class="text-gray-300 leading-8 text-lg">
+        Esperando análisis del mercado...
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://s3.tradingview.com/tv.js"></script>
+
+<script>
+
+function random(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function generateFakeMarketData() {
+
+  const price = random(30000, 120000);
+  const rsi = random(20, 80);
+  const macd = random(-500, 500);
+  const ema20 = price - random(-500, 500);
+  const ema50 = price - random(-1000, 1000);
+
+  let trend = 'NEUTRAL';
+  let signal = 'ESPERAR';
+  let risk = 'MEDIO';
+
+  if (ema20 > ema50) {
+    trend = 'ALCISTA';
+  }
+
+  if (ema20 < ema50) {
+    trend = 'BAJISTA';
+  }
+
+  if (rsi < 35 && ema20 > ema50) {
+    signal = 'COMPRAR';
+  }
+
+  if (rsi > 70 && ema20 < ema50) {
+    signal = 'VENDER';
+  }
+
+  if (signal === 'COMPRAR') {
+    risk = 'BAJO';
+  }
+
+  if (signal === 'VENDER') {
+    risk = 'ALTO';
+  }
+
+  return {
+    price: price.toFixed(2),
+    trend,
+    signal,
+    risk,
+    rsi: rsi.toFixed(2),
+    macd: macd.toFixed(2),
+    ema20: ema20.toFixed(2),
+    ema50: ema50.toFixed(2),
+    support: (price - 1200).toFixed(2),
+    resistance: (price + 1200).toFixed(2),
+    prediction: (price + random(-2000, 3000)).toFixed(2),
+    probability: random(60, 95).toFixed(2) + '%'
+  };
+}
+
+function updateUI(data) {
+
+  document.getElementById('price').innerText = '$' + data.price;
+  document.getElementById('trend').innerText = data.trend;
+  document.getElementById('signal').innerText = data.signal;
+  document.getElementById('risk').innerText = data.risk;
+
+  document.getElementById('rsi').innerText = data.rsi;
+  document.getElementById('macd').innerText = data.macd;
+  document.getElementById('ema20').innerText = data.ema20;
+  document.getElementById('ema50').innerText = data.ema50;
+  document.getElementById('support').innerText = data.support;
+  document.getElementById('resistance').innerText = data.resistance;
+
+  document.getElementById('prediction').innerText = '$' + data.prediction;
+  document.getElementById('probability').innerText = data.probability;
+
+  let recommendation = 'Mercado estable';
+
+  if (data.signal === 'COMPRAR') {
+    recommendation = 'Oportunidad alcista detectada';
+  }
+
+  if (data.signal === 'VENDER') {
+    recommendation = 'Posible corrección bajista';
+  }
+
+  document.getElementById('recommendation').innerText = recommendation;
+
+  const analysis = `
+  El mercado actualmente muestra una tendencia ${data.trend.toLowerCase()}.
+
+  El RSI se sitúa en ${data.rsi}, indicando ${data.rsi < 30 ? 'sobreventa' : data.rsi > 70 ? 'sobrecompra' : 'equilibrio'}.
+
+  La señal actual es ${data.signal} con un nivel de riesgo ${data.risk.toLowerCase()}.
+
+  Soporte principal: ${data.support}
+  Resistencia principal: ${data.resistance}
+
+  La IA estima una probabilidad de movimiento del ${data.probability}.
+
+  Recomendación profesional:
+
+  ${recommendation}.
+  `;
+
+  document.getElementById('aiAnalysis').innerText = analysis;
+
+  const signalElement = document.getElementById('signal');
+
+  signalElement.className = 'text-4xl font-black pulse';
+
+  if (data.signal === 'COMPRAR') {
+    signalElement.classList.add('buy');
+  }
+
+  if (data.signal === 'VENDER') {
+    signalElement.classList.add('sell');
+  }
+
+  if (data.signal === 'ESPERAR') {
+    signalElement.classList.add('neutral');
+  }
+}
+
+let currentInterval = '60';
+let currentSymbol = 'BINANCE:BTCUSDT';
+
+function loadTradingView(symbol = 'BINANCE:BTCUSDT', interval = '60') {
+
+  currentSymbol = symbol;
+  currentInterval = interval;
+
+  const container = document.getElementById('tradingview_widget');
+
+  if (!container) {
+    console.error('Contenedor TradingView no encontrado');
+    return;
+  }
+
+  container.innerHTML = '';
+
+  if (typeof TradingView === 'undefined') {
+    container.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100%;font-size:24px;color:white;">Error cargando TradingView</div>';
+    return;
+  }
+
+  new TradingView.widget({
+    autosize: true,
+    symbol: symbol,
+    interval: interval,
+    timezone: 'Etc/UTC',
+    theme: 'dark',
+    style: '1',
+    locale: 'es',
+    toolbar_bg: '#050816',
+    enable_publishing: false,
+    allow_symbol_change: true,
+    withdateranges: true,
+    hide_side_toolbar: false,
+    details: true,
+    hotlist: true,
+    calendar: true,
+    studies: [
+      'RSI@tv-basicstudies',
+      'MACD@tv-basicstudies'
+    ],
+    container_id: 'tradingview_widget'
+  });
+}
+
+function updateTradingViewSymbol() {
+
+  const symbol = document.getElementById('marketSelect').value;
+
+  const mapping = {
+    BTCUSDT: 'BINANCE:BTCUSDT',
+    ETHUSDT: 'BINANCE:ETHUSDT',
+    SOLUSDT: 'BINANCE:SOLUSDT',
+    XRPUSDT: 'BINANCE:XRPUSDT',
+    ADAUSDT: 'BINANCE:ADAUSDT',
+    BNBUSDT: 'BINANCE:BNBUSDT',
+    DOGEUSDT: 'BINANCE:DOGEUSDT',
+    AVAXUSDT: 'BINANCE:AVAXUSDT',
+    LINKUSDT: 'BINANCE:LINKUSDT',
+    EURUSD: 'FX:EURUSD',
+    GBPUSD: 'FX:GBPUSD',
+    NASDAQ: 'NASDAQ:NDX',
+    SP500: 'SP:SPX',
+    ORO: 'TVC:GOLD',
+    AAPL: 'NASDAQ:AAPL',
+    TSLA: 'NASDAQ:TSLA',
+    NVDA: 'NASDAQ:NVDA'
+  };
+
+  const tvSymbol = mapping[symbol] || 'BINANCE:BTCUSDT';
+
+  loadTradingView(tvSymbol, currentInterval);
+}
+
+function changeInterval(interval, buttonElement) {
+
+  currentInterval = interval;
+
+  const buttons = document.querySelectorAll('.interval-btn');
+
+  buttons.forEach(btn => {
+    btn.classList.remove('bg-blue-600', 'border-blue-400', 'glow');
+    btn.classList.add('bg-black/40', 'border-white/10');
+  });
+
+  if (buttonElement) {
+    buttonElement.classList.remove('bg-black/40', 'border-white/10');
+    buttonElement.classList.add('bg-blue-600', 'border-blue-400', 'glow');
+  }
+
+  updateTradingViewSymbol();
+}
+
+function analyzeMarket() {
+
+  updateTradingViewSymbol();
+
+  const data = generateFakeMarketData();
+
+  updateUI(data);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+
+  analyzeMarket();
+
+  setInterval(() => {
+    analyzeMarket();
+  }, 5000);
+
+});
+
+</script>
+
+</div>
+
+<script>
+
+function openTerminal() {
+  document.getElementById('welcomeScreen').classList.add('hidden');
+  document.getElementById('terminalScreen').classList.remove('hidden');
+}
+
+function openAITrading() {
+  document.getElementById('welcomeScreen').classList.add('hidden');
+  document.getElementById('aiTradingScreen').classList.remove('hidden');
+}
+
+function backToHome() {
+  document.getElementById('welcomeScreen').classList.remove('hidden');
+  document.getElementById('terminalScreen').classList.add('hidden');
+  document.getElementById('aiTradingScreen').classList.add('hidden');
+}
+
+function sendAIMessage() {
+
+  const input = document.getElementById('aiInput');
+  const chat = document.getElementById('chatMessages');
+
+  const message = input.value.trim();
+
+  if (!message) {
+    return;
+  }
+
+  const userMessage = document.createElement('div');
+  userMessage.className = 'bg-white/5 border border-white/10 rounded-2xl p-5';
+  userMessage.innerHTML = `
+    <p class="text-blue-400 font-bold mb-2">Tú</p>
+    <p class="text-gray-300 leading-8">${message}</p>
+  `;
+
+  chat.appendChild(userMessage);
+
+  const responses = [
+    'El mercado actualmente mantiene una estructura alcista con posible continuación de tendencia si Bitcoin mantiene soporte institucional.',
+    'El RSI muestra fuerza compradora moderada. Podría haber continuación alcista a corto plazo.',
+    'Ethereum presenta una zona importante de liquidez institucional cerca de resistencia.',
+    'La volatilidad actual del mercado es elevada. Se recomienda gestión de riesgo conservadora.',
+    'Los datos macroeconómicos favorecen actualmente los activos de riesgo como tecnología y criptomonedas.',
+    'La IA detecta posible acumulación institucional en marcos temporales altos.'
+  ];
+
+  const aiMessage = document.createElement('div');
+  aiMessage.className = 'bg-purple-500/10 border border-purple-500/20 rounded-2xl p-5';
+
+  const response = responses[Math.floor(Math.random() * responses.length)];
+
+  aiMessage.innerHTML = `
+    <p class="text-purple-400 font-bold mb-2">IA Trading</p>
+    <p class="text-gray-300 leading-8">${response}</p>
+  `;
+
+  setTimeout(() => {
+    chat.appendChild(aiMessage);
+    chat.scrollTop = chat.scrollHeight;
+  }, 800);
+
+  input.value = '';
+}
+
+</script>
 
 </body>
 </html>
