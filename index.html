@@ -1,805 +1,259 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Analizador Institucional de Mercados IA</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src * wss:;">
+<title>Terminal IA Trading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+  :root {
+    --bg:#080c10;--bg2:#0d1117;--bg3:#141b24;--bg4:#1a2332;
+    --border:#1e2d3d;--border2:#2a3f56;--text:#e2eaf4;--muted:#6b8099;
+    --dim:#3a5068;--accent:#00d4aa;--accent2:#0095ff;
+    --up:#00c97a;--down:#ff4d5a;--warn:#f5a623;
+    --font-mono:'Space Mono',monospace;--font-display:'Syne',sans-serif;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-mono);font-size:13px;min-height:100vh;overflow-x:hidden;padding-top:var(--safe-top);padding-bottom:var(--safe-bottom)}
+  body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:9999}
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  nav{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:100}
+  .nav-logo{font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--accent);letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+  .nav-logo span{color:var(--text)}
+  .nav-dot{width:7px;height:7px;border-radius:50%;background:var(--up);animation:blink 2s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  .nav-tabs{display:flex;gap:2px}
+  .nav-tab{padding:6px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--muted);border:1px solid transparent;transition:all .2s;text-transform:uppercase}
+  .nav-tab:hover{color:var(--text);border-color:var(--border2)}
+  .nav-tab.active{color:var(--accent);border-color:var(--accent);background:rgba(0,212,170,.06)}
+  .nav-status{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px}
+  .status-live{font-size:9px;color:var(--up);letter-spacing:.1em}
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  .ticker-bar{background:var(--bg2);border-bottom:1px solid var(--border);overflow:hidden;height:30px;display:flex;align-items:center}
+  .ticker-track{display:flex;white-space:nowrap;animation:ticker 40s linear infinite;will-change:transform}
+  @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .ticker-item{display:inline-flex;align-items:center;gap:6px;padding:0 16px;border-right:1px solid var(--border);font-size:10px;letter-spacing:.05em}
+  .ticker-sym{color:var(--muted)}.ticker-price{color:var(--text);font-weight:700}
+  .ticker-chg.up{color:var(--up)}.ticker-chg.down{color:var(--down)}
 
-    body {
-      background: url('bg.png') no-repeat center center fixed;
-      background-size: cover;
+  .section{display:none;padding:14px 14px}.section.active{display:block}
 
-      background: #050816;
-      color: white;
-      font-family: Arial, sans-serif;
-      overflow-x: hidden;
-    }
+  .grid-4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+  .grid-3{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+  @media(min-width:700px){.grid-4{grid-template-columns:repeat(4,1fr)}.grid-3{grid-template-columns:repeat(3,1fr)}}
 
-    .glass {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      backdrop-filter: blur(12px);
-    }
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px}
+  .card-header{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .card-value{font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+  .card-sub{font-size:10px;color:var(--muted);margin-top:4px}
+  .card-chg{font-size:11px;font-weight:700;margin-top:3px}
+  .card-chg.up{color:var(--up)}.card-chg.down{color:var(--down)}
 
-    .glow {
-      box-shadow: 0 0 25px rgba(59,130,246,0.35);
-    }
+  .chart-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+  .chart-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+  .chart-title{font-family:var(--font-display);font-size:13px;font-weight:700}
+  .chart-subtitle{font-size:10px;color:var(--muted);margin-top:2px}
+  .tf-btn{padding:4px 8px;font-size:9px;letter-spacing:.08em;cursor:pointer;border-radius:3px;border:1px solid var(--border2);color:var(--muted);background:transparent;font-family:var(--font-mono);transition:all .15s;text-transform:uppercase;-webkit-tap-highlight-color:transparent}
+  .tf-btn.active{color:var(--accent);border-color:var(--accent);background:rgba(0,212,170,.08)}
+  .tfs{display:flex;gap:3px}
+  #chart-container{height:300px}
+  .chart-footer{padding:8px 14px;display:flex;gap:12px;flex-wrap:wrap}
+  .ind-item{font-size:10px}.ind-label{color:var(--muted)}.ind-val{margin-left:4px;font-weight:700}
 
-    .buy {
-      color: #00ff99;
-    }
+  .sym-grid{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+  .sym-btn{padding:6px 12px;border-radius:4px;border:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--muted);cursor:pointer;background:var(--bg2);transition:all .15s;letter-spacing:.05em;-webkit-tap-highlight-color:transparent;min-height:36px}
+  .sym-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,170,.06)}
 
-    .sell {
-      color: #ff4d4d;
-    }
+  .chat-box{background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;height:calc(100vh - 200px);min-height:400px}
+  .chat-header{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .chat-avatar{width:34px;height:34px;border-radius:6px;background:linear-gradient(135deg,rgba(0,212,170,.25),rgba(0,149,255,.25));border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+  .chat-name{font-family:var(--font-display);font-size:13px;font-weight:700}
+  .chat-status{font-size:9px;color:var(--up);letter-spacing:.1em}
+  .chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;-webkit-overflow-scrolling:touch}
+  .msg{display:flex;gap:8px;max-width:90%}
+  .msg.user{align-self:flex-end;flex-direction:row-reverse}
+  .msg-bubble{padding:10px 13px;border-radius:8px;font-size:13px;line-height:1.7}
+  .msg.ai .msg-bubble{background:var(--bg3);border:1px solid var(--border);color:var(--text)}
+  .msg.user .msg-bubble{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);color:var(--text)}
+  .msg-icon{width:26px;height:26px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--bg3);border:1px solid var(--border);margin-top:2px}
+  .chat-input-row{padding:10px;border-top:1px solid var(--border);display:flex;gap:7px}
+  .chat-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:9px 11px;color:var(--text);font-family:var(--font-mono);font-size:13px;outline:none;transition:border-color .2s;resize:none;-webkit-appearance:none}
+  .chat-input:focus{border-color:var(--accent)}
+  .chat-input::placeholder{color:var(--dim)}
+  .chat-send{padding:9px 16px;background:var(--accent);color:var(--bg);border:none;border-radius:6px;cursor:pointer;font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;-webkit-tap-highlight-color:transparent;min-width:70px}
+  .chat-send:disabled{opacity:.4}
+  .typing-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);animation:tdot 1.4s infinite;margin:0 2px}
+  .typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+  @keyframes tdot{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+  .stream-cursor::after{content:'▋';animation:blink .7s infinite;color:var(--accent)}
 
-    .neutral {
-      color: #ffd966;
-    }
+  .market-list{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+  .market-list-header{padding:9px 13px;border-bottom:1px solid var(--border);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .market-row{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
+  .market-row:last-child{border-bottom:none}
+  .market-row:active{background:var(--bg3)}
+  .market-row-sym{font-size:12px;font-weight:700;color:var(--text)}
+  .market-row-name{font-size:9px;color:var(--muted);margin-top:1px}
+  .market-row-price{font-size:12px;font-weight:700;text-align:right}
+  .market-row-chg{font-size:10px;text-align:right;margin-top:1px}
+  .market-row-chg.up{color:var(--up)}.market-row-chg.down{color:var(--down)}
 
-    iframe {
-      width: 100%;
-      border: none;
-      border-radius: 20px;
-      background: #050816;
-    }
+  .signal-card{background:var(--bg2);border-radius:8px;padding:12px;border:1px solid var(--border);margin-bottom:9px;display:flex;align-items:flex-start;gap:10px}
+  .signal-badge{padding:4px 9px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;flex-shrink:0;margin-top:2px}
+  .signal-badge.buy{background:rgba(0,201,122,.15);color:var(--up);border:1px solid rgba(0,201,122,.3)}
+  .signal-badge.sell{background:rgba(255,77,90,.15);color:var(--down);border:1px solid rgba(255,77,90,.3)}
+  .signal-badge.neutral{background:rgba(245,166,35,.15);color:var(--warn);border:1px solid rgba(245,166,35,.3)}
+  .signal-sym{font-weight:700;font-size:12px}
+  .signal-desc{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5}
+  .signal-time{font-size:9px;color:var(--dim);margin-top:4px}
 
-    .pulse {
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.6;
-      }
-
-      100% {
-        opacity: 1;
-      }
-    }
-  </style>
+  .section-title{font-family:var(--font-display);font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px;letter-spacing:-.01em}
+  .section-sub{font-size:10px;color:var(--muted);margin-bottom:16px;letter-spacing:.05em;text-transform:uppercase}
+  .loading-text{color:var(--dim);font-size:11px;animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .quick-btns{display:flex;gap:5px;flex-wrap:wrap;padding:0 10px 6px}
+  .quick-btn{padding:6px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-family:var(--font-mono);font-size:10px;color:var(--muted);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
+  .quick-btn:active{color:var(--accent);border-color:var(--accent);background:rgba(0,212,170,.06)}
+  pre{white-space:pre-wrap}
+  ::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+  .fade-in{animation:fadeIn .35s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .market-big{cursor:pointer;transition:border-color .2s;-webkit-tap-highlight-color:transparent}
+  .market-big:active{border-color:var(--border2)}
+  .msg-bubble strong{color:var(--accent);font-weight:700}
+  .msg-bubble em{color:var(--warn);font-style:italic}
+  .msg-bubble code{background:var(--bg4);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--accent2)}
+  .msg-bubble ul,.msg-bubble ol{margin:6px 0 6px 16px}
+  .msg-bubble li{margin-bottom:3px}
+</style>
 </head>
 <body>
 
-<div id="welcomeScreen" class="fixed inset-0 z-50 bg-[#050816] flex items-center justify-center p-6">
-
-  <div class="max-w-6xl w-full">
-
-    <div class="text-center mb-14">
-      <h1 class="text-7xl font-black mb-6 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
-        TERMINAL INSTITUCIONAL IA
-      </h1>
-
-      <p class="text-2xl text-gray-400 max-w-4xl mx-auto leading-10">
-        Plataforma profesional de análisis financiero, inteligencia artificial y trading institucional en tiempo real.
-      </p>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-      <div onclick="openTerminal()" class="glass rounded-3xl p-10 cursor-pointer hover:scale-[1.02] transition-all glow border border-cyan-500/30">
-
-        <div class="mb-6 text-cyan-400 text-6xl"></div>
-
-        <h2 class="text-4xl font-black mb-5">
-          Terminal Profesional
-        </h2>
-
-        <p class="text-gray-400 text-lg leading-8 mb-8">
-          Analiza criptomonedas, forex, índices, acciones y materias primas con gráficos profesionales, indicadores técnicos y señales automáticas.
-        </p>
-
-        <div class="space-y-3 text-lg">
-          <div>✅ Gráficos de velas</div>
-          <div>✅ RSI + MACD</div>
-          <div>✅ IA predictiva</div>
-          <div>✅ Señales de compra y venta</div>
-          <div>✅ Multi mercado</div>
-        </div>
-
-      </div>
-
-      <div onclick="openAITrading()" class="glass rounded-3xl p-10 cursor-pointer hover:scale-[1.02] transition-all glow border border-purple-500/30">
-
-        <div class="mb-6 text-purple-400 text-6xl"></div>
-
-        <h2 class="text-4xl font-black mb-5">
-          IA Experta en Trading
-        </h2>
-
-        <p class="text-gray-400 text-lg leading-8 mb-8">
-          Pregunta cualquier cosa sobre trading, mercados financieros, análisis técnico o estrategias y recibe respuestas profesionales en tiempo real.
-        </p>
-
-        <div class="space-y-3 text-lg">
-          <div>✅ IA especializada</div>
-          <div>✅ Datos en tiempo real</div>
-          <div>✅ Estrategias profesionales</div>
-          <div>✅ Análisis institucional</div>
-          <div>✅ Soporte multi activos</div>
-        </div>
-
-      </div>
-
-    </div>
-
+<nav>
+  <div class="nav-logo"><div class="nav-dot"></div>TERMINAL<span>&nbsp;IA</span></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showSection('markets',this)">Mercados</div>
+    <div class="nav-tab" onclick="showSection('terminal',this)">Charts</div>
+    <div class="nav-tab" onclick="showSection('ai',this)">IA</div>
   </div>
+  <div class="nav-status"><span class="status-live">● LIVE</span><span id="last-update" style="font-size:9px">—</span></div>
+</nav>
 
+<div class="ticker-bar"><div class="ticker-track" id="ticker-track"></div></div>
+
+<!-- MARKETS -->
+<div class="section active fade-in" id="section-markets">
+  <div class="section-title">Visión global</div>
+  <div class="section-sub">Datos en tiempo real · Actualización cada 30s</div>
+  <div class="grid-4">
+    <div class="card"><div class="card-header">Bitcoin (BTC)</div><div class="card-value" id="btc-price"><span class="loading-text">...</span></div><div class="card-chg up" id="btc-chg">—</div><div class="card-sub" id="btc-cap">Cap: —</div></div>
+    <div class="card"><div class="card-header">Ethereum (ETH)</div><div class="card-value" id="eth-price"><span class="loading-text">...</span></div><div class="card-chg up" id="eth-chg">—</div><div class="card-sub" id="eth-cap">Cap: —</div></div>
+    <div class="card"><div class="card-header">Dominancia BTC</div><div class="card-value" id="btc-dom">—</div><div class="card-sub" id="total-cap">Cap total: —</div></div>
+    <div class="card"><div class="card-header">Miedo &amp; Codicia</div><div class="card-value" id="fng-num">—</div><div class="card-sub" id="fng-txt">—</div></div>
+  </div>
+  <div class="grid-3" id="market-big-grid"></div>
+  <div style="font-family:var(--font-display);font-size:13px;font-weight:800;color:var(--text);margin-bottom:10px">Señales automáticas</div>
+  <div id="signals-container"><div class="loading-text">Generando señales...</div></div>
 </div>
 
-<div id="aiTradingScreen" class="hidden min-h-screen p-6 bg-[#050816]">
-
-  <div class="max-w-7xl mx-auto">
-
-    <div class="flex justify-between items-center mb-10">
-
-      <div>
-        <h1 class="text-6xl font-black bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent mb-3">
-          IA EXPERTA EN TRADING
-        </h1>
-
-        <p class="text-gray-400 text-xl">
-          Asistente institucional avanzado para mercados financieros
-        </p>
+<!-- TERMINAL -->
+<div class="section fade-in" id="section-terminal">
+  <div class="section-title">Terminal de análisis</div>
+  <div class="section-sub">Velas · Indicadores · Multi-activo</div>
+  <div class="sym-grid" id="sym-grid"></div>
+  <div class="chart-panel">
+    <div class="chart-header">
+      <div><div class="chart-title" id="chart-title">BTC/USDT</div><div class="chart-subtitle" id="chart-ohlc">O — H — L — C —</div></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div id="chart-live-price" style="font-family:var(--font-display);font-size:16px;font-weight:800">—</div>
+        <div class="tfs">
+          <button class="tf-btn active" onclick="setTF(this,'1m')">1M</button>
+          <button class="tf-btn" onclick="setTF(this,'5m')">5M</button>
+          <button class="tf-btn" onclick="setTF(this,'15m')">15M</button>
+          <button class="tf-btn" onclick="setTF(this,'1h')">1H</button>
+          <button class="tf-btn" onclick="setTF(this,'4h')">4H</button>
+          <button class="tf-btn" onclick="setTF(this,'1d')">1D</button>
+        </div>
       </div>
-
-      <button onclick="backToHome()" class="bg-black/40 hover:bg-blue-600 px-6 py-3 rounded-2xl border border-white/10 transition-all">
-        Volver
-      </button>
-
     </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-      <div class="lg:col-span-2 glass rounded-3xl p-6">
-
-        <div id="chatMessages" class="h-[650px] overflow-y-auto space-y-6 mb-6 pr-2">
-
-          <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-5">
-            <p class="text-cyan-400 font-bold mb-2">IA Trading</p>
-            <p class="text-gray-300 leading-8">
-              Hola. Soy tu inteligencia artificial institucional especializada en trading y mercados financieros. Puedes preguntarme sobre criptomonedas, forex, acciones, análisis técnico, estrategias, riesgo, entradas, salidas o tendencias del mercado.
-            </p>
-          </div>
-
-        </div>
-
-        <div class="flex gap-4">
-
-          <input
-            id="aiInput"
-            type="text"
-            placeholder="Pregunta cualquier cosa sobre trading..."
-            class="flex-1 bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none"
-          />
-
-          <button onclick="sendAIMessage()" class="bg-purple-600 hover:bg-purple-700 px-8 py-4 rounded-2xl font-bold transition-all glow">
-            Preguntar
-          </button>
-
-        </div>
-
-      </div>
-
-      <div class="glass rounded-3xl p-6">
-
-        <h2 class="text-3xl font-black mb-6">
-          Datos del Mercado
-        </h2>
-
-        <div class="space-y-5">
-
-          <div class="bg-black/30 rounded-2xl p-5">
-            <p class="text-gray-400 mb-2">Bitcoin</p>
-            <h3 class="text-3xl font-black buy">$108,245</h3>
-          </div>
-
-          <div class="bg-black/30 rounded-2xl p-5">
-            <p class="text-gray-400 mb-2">Ethereum</p>
-            <h3 class="text-3xl font-black buy">$5,820</h3>
-          </div>
-
-          <div class="bg-black/30 rounded-2xl p-5">
-            <p class="text-gray-400 mb-2">Sentimiento Global</p>
-            <h3 class="text-3xl font-black text-yellow-400">ALCISTA</h3>
-          </div>
-
-          <div class="bg-black/30 rounded-2xl p-5">
-            <p class="text-gray-400 mb-2">Volatilidad</p>
-            <h3 class="text-3xl font-black text-red-400">MEDIA</h3>
-          </div>
-
-        </div>
-
-      </div>
-
+    <div id="chart-container"></div>
+    <div class="chart-footer">
+      <div class="ind-item"><span class="ind-label">RSI(14)</span><span class="ind-val" id="ind-rsi">—</span></div>
+      <div class="ind-item"><span class="ind-label">MACD</span><span class="ind-val" id="ind-macd">—</span></div>
+      <div class="ind-item"><span class="ind-label">EMA20</span><span class="ind-val" id="ind-ema20">—</span></div>
+      <div class="ind-item"><span class="ind-label">EMA50</span><span class="ind-val" id="ind-ema50">—</span></div>
+      <div class="ind-item"><span class="ind-label">Soporte</span><span class="ind-val" id="ind-sup">—</span></div>
+      <div class="ind-item"><span class="ind-label">Resistencia</span><span class="ind-val" id="ind-res">—</span></div>
     </div>
-
   </div>
-
 </div>
 
-<div id="terminalScreen" class="hidden">
-
-<div class="min-h-screen p-6">
-
-  <div class="flex flex-col lg:flex-row justify-between items-center gap-6 mb-10">
-
-    <div>
-      <h1 class="text-5xl font-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-3">
-        ANALIZADOR INSTITUCIONAL IA
-      </h1>
-
-      <p class="text-gray-400 text-lg">
-        Plataforma profesional de análisis financiero en tiempo real
-      </p>
+<!-- AI CHAT -->
+<div class="section fade-in" id="section-ai">
+  <div class="section-title">IA Experta</div>
+  <div class="section-sub">Análisis institucional con datos live</div>
+  <div class="chat-box">
+    <div class="chat-header">
+      <div class="chat-avatar">🤖</div>
+      <div><div class="chat-name">Analista IA Institucional</div><div class="chat-status">● CONECTADO · DATOS LIVE</div></div>
     </div>
-
-    <div class="flex flex-wrap gap-4">
-
-      <select id="marketSelect" class="bg-black border border-gray-700 rounded-2xl px-5 py-3 text-white">
-        <option>BTCUSDT</option>
-        <option>ETHUSDT</option>
-        <option>SOLUSDT</option>
-        <option>XRPUSDT</option>
-        <option>ADAUSDT</option>
-        <option>BNBUSDT</option>
-        <option>DOGEUSDT</option>
-        <option>AVAXUSDT</option>
-        <option>LINKUSDT</option>
-        <option>EURUSD</option>
-        <option>GBPUSD</option>
-        <option>NASDAQ</option>
-        <option>SP500</option>
-        <option>ORO</option>
-        <option>AAPL</option>
-        <option>TSLA</option>
-        <option>NVDA</option>
-      </select>
-
-      <button onclick="analyzeMarket()" class="bg-blue-600 hover:bg-blue-700 transition-all px-7 py-3 rounded-2xl font-bold glow">
-        Analizar Mercado
-      </button>
-
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg ai fade-in">
+        <div class="msg-icon">🤖</div>
+        <div class="msg-bubble">Hola. Soy tu analista institucional con datos de mercado en tiempo real.<br><br>Puedo ayudarte con <strong>análisis técnico</strong>, <strong>niveles clave</strong>, <strong>estrategias</strong> y <strong>gestión de riesgo</strong>. ¿Qué activo quieres analizar?</div>
+      </div>
     </div>
-
+    <div class="quick-btns">
+      <div class="quick-btn" onclick="quickAsk('Análisis técnico completo de BTC con niveles de entrada, stop y objetivo')">📊 BTC análisis</div>
+      <div class="quick-btn" onclick="quickAsk('¿Es buen momento para entrar en ETH? Dame niveles concretos')">⚡ ETH entrada</div>
+      <div class="quick-btn" onclick="quickAsk('Resumen del mercado cripto hoy y qué activos tienen mejor setup')">🌐 Resumen mercado</div>
+    </div>
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chat-input" rows="1" placeholder="Pregunta sobre mercados..." onkeydown="handleKey(event)"></textarea>
+      <button class="chat-send" id="chat-send" onclick="sendChat()">↑</button>
+    </div>
   </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
-
-    <div class="glass p-6 rounded-3xl">
-      <p class="text-gray-400 mb-2">Precio Actual</p>
-      <h2 id="price" class="text-4xl font-black">-</h2>
-    </div>
-
-    <div class="glass p-6 rounded-3xl">
-      <p class="text-gray-400 mb-2">Tendencia</p>
-      <h2 id="trend" class="text-4xl font-black">-</h2>
-    </div>
-
-    <div class="glass p-6 rounded-3xl">
-      <p class="text-gray-400 mb-2">Señal IA</p>
-      <h2 id="signal" class="text-4xl font-black pulse">-</h2>
-    </div>
-
-    <div class="glass p-6 rounded-3xl">
-      <p class="text-gray-400 mb-2">Riesgo</p>
-      <h2 id="risk" class="text-4xl font-black">-</h2>
-    </div>
-
-  </div>
-
-  <div class="glass p-6 rounded-3xl mb-8 glow">
-
-    <div class="flex flex-col lg:flex-row justify-between items-center gap-5 mb-5">
-
-      <h2 class="text-3xl font-bold">
-        Gráfico Profesional de Velas
-      </h2>
-
-      <div id="intervalButtons" class="flex gap-3 flex-wrap">
-        <button onclick="changeInterval('1', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">1 Min</button>
-
-        <button onclick="changeInterval('5', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">5 Min</button>
-
-        <button onclick="changeInterval('15', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">15 Min</button>
-
-        <button onclick="changeInterval('30', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">30 Min</button>
-
-        <button onclick="changeInterval('60', this)" class="interval-btn bg-blue-600 px-5 py-2 rounded-xl border border-blue-400 glow">1 Hora</button>
-
-        <button onclick="changeInterval('240', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">4 Horas</button>
-
-        <button onclick="changeInterval('D', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">1 Día</button>
-
-        <button onclick="changeInterval('W', this)" class="interval-btn bg-black/40 hover:bg-blue-600 transition-all px-5 py-2 rounded-xl border border-white/10">1 Semana</button>
-      </div>
-
-    </div>
-
-    <div id="tradingview_widget" style="height:700px;width:100%;"></div>
-
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-
-    <div class="glass p-6 rounded-3xl">
-
-      <h2 class="text-2xl font-bold mb-5">Indicadores Técnicos</h2>
-
-      <div class="space-y-4">
-
-        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
-          <span>RSI</span>
-          <span id="rsi">-</span>
-        </div>
-
-        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
-          <span>MACD</span>
-          <span id="macd">-</span>
-        </div>
-
-        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
-          <span>EMA 20</span>
-          <span id="ema20">-</span>
-        </div>
-
-        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
-          <span>EMA 50</span>
-          <span id="ema50">-</span>
-        </div>
-
-        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
-          <span>Soporte</span>
-          <span id="support">-</span>
-        </div>
-
-        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
-          <span>Resistencia</span>
-          <span id="resistance">-</span>
-        </div>
-
-      </div>
-
-    </div>
-
-    <div class="glass p-6 rounded-3xl">
-
-      <h2 class="text-2xl font-bold mb-5">Predicción IA</h2>
-
-      <div class="space-y-4">
-
-        <div class="bg-black/30 p-4 rounded-2xl">
-          <p class="text-gray-400 mb-2">Precio Predicho</p>
-          <h2 id="prediction" class="text-3xl font-black">-</h2>
-        </div>
-
-        <div class="bg-black/30 p-4 rounded-2xl">
-          <p class="text-gray-400 mb-2">Probabilidad</p>
-          <h2 id="probability" class="text-3xl font-black">-</h2>
-        </div>
-
-        <div class="bg-black/30 p-4 rounded-2xl">
-          <p class="text-gray-400 mb-2">Recomendación</p>
-          <h2 id="recommendation" class="text-xl font-bold">-</h2>
-        </div>
-
-      </div>
-
-    </div>
-
-    <div class="glass p-6 rounded-3xl">
-
-      <h2 class="text-2xl font-bold mb-5">Sentimiento del Mercado</h2>
-
-      <div class="space-y-6">
-
-        <div>
-          <div class="flex justify-between mb-2">
-            <span>Miedo y Codicia</span>
-            <span>78</span>
-          </div>
-
-          <div class="w-full bg-black/40 h-4 rounded-full overflow-hidden">
-            <div class="bg-green-500 h-4 rounded-full" style="width:78%"></div>
-          </div>
-        </div>
-
-        <div>
-          <div class="flex justify-between mb-2">
-            <span>Probabilidad Alcista</span>
-            <span>82%</span>
-          </div>
-
-          <div class="w-full bg-black/40 h-4 rounded-full overflow-hidden">
-            <div class="bg-blue-500 h-4 rounded-full" style="width:82%"></div>
-          </div>
-        </div>
-
-        <div>
-          <div class="flex justify-between mb-2">
-            <span>Riesgo Global</span>
-            <span>34%</span>
-          </div>
-
-          <div class="w-full bg-black/40 h-4 rounded-full overflow-hidden">
-            <div class="bg-yellow-500 h-4 rounded-full" style="width:34%"></div>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-
-    <div class="glass p-6 rounded-3xl">
-
-      <h2 class="text-2xl font-bold mb-5">Mercados Globales</h2>
-
-      <div class="space-y-4">
-
-        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
-          <span>Bitcoin</span>
-          <span class="buy">+2.4%</span>
-        </div>
-
-        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
-          <span>Ethereum</span>
-          <span class="buy">+1.8%</span>
-        </div>
-
-        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
-          <span>NASDAQ</span>
-          <span class="sell">-0.9%</span>
-        </div>
-
-        <div class="flex justify-between bg-black/30 p-4 rounded-2xl">
-          <span>Oro</span>
-          <span class="buy">+0.6%</span>
-        </div>
-
-      </div>
-
-    </div>
-
-    <div class="glass p-6 rounded-3xl">
-
-      <h2 class="text-2xl font-bold mb-5">Análisis Profesional IA</h2>
-
-      <div id="aiAnalysis" class="text-gray-300 leading-8 text-lg">
-        Esperando análisis del mercado...
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-<script src="https://s3.tradingview.com/tv.js"></script>
-
-<script>
-
-function random(min, max) {
-  return Math.random() * (max - min) + min;
-}
-
-function generateFakeMarketData() {
-
-  const price = random(30000, 120000);
-  const rsi = random(20, 80);
-  const macd = random(-500, 500);
-  const ema20 = price - random(-500, 500);
-  const ema50 = price - random(-1000, 1000);
-
-  let trend = 'NEUTRAL';
-  let signal = 'ESPERAR';
-  let risk = 'MEDIO';
-
-  if (ema20 > ema50) {
-    trend = 'ALCISTA';
-  }
-
-  if (ema20 < ema50) {
-    trend = 'BAJISTA';
-  }
-
-  if (rsi < 35 && ema20 > ema50) {
-    signal = 'COMPRAR';
-  }
-
-  if (rsi > 70 && ema20 < ema50) {
-    signal = 'VENDER';
-  }
-
-  if (signal === 'COMPRAR') {
-    risk = 'BAJO';
-  }
-
-  if (signal === 'VENDER') {
-    risk = 'ALTO';
-  }
-
-  return {
-    price: price.toFixed(2),
-    trend,
-    signal,
-    risk,
-    rsi: rsi.toFixed(2),
-    macd: macd.toFixed(2),
-    ema20: ema20.toFixed(2),
-    ema50: ema50.toFixed(2),
-    support: (price - 1200).toFixed(2),
-    resistance: (price + 1200).toFixed(2),
-    prediction: (price + random(-2000, 3000)).toFixed(2),
-    probability: random(60, 95).toFixed(2) + '%'
-  };
-}
-
-function updateUI(data) {
-
-  document.getElementById('price').innerText = '$' + data.price;
-  document.getElementById('trend').innerText = data.trend;
-  document.getElementById('signal').innerText = data.signal;
-  document.getElementById('risk').innerText = data.risk;
-
-  document.getElementById('rsi').innerText = data.rsi;
-  document.getElementById('macd').innerText = data.macd;
-  document.getElementById('ema20').innerText = data.ema20;
-  document.getElementById('ema50').innerText = data.ema50;
-  document.getElementById('support').innerText = data.support;
-  document.getElementById('resistance').innerText = data.resistance;
-
-  document.getElementById('prediction').innerText = '$' + data.prediction;
-  document.getElementById('probability').innerText = data.probability;
-
-  let recommendation = 'Mercado estable';
-
-  if (data.signal === 'COMPRAR') {
-    recommendation = 'Oportunidad alcista detectada';
-  }
-
-  if (data.signal === 'VENDER') {
-    recommendation = 'Posible corrección bajista';
-  }
-
-  document.getElementById('recommendation').innerText = recommendation;
-
-  const analysis = `
-  El mercado actualmente muestra una tendencia ${data.trend.toLowerCase()}.
-
-  El RSI se sitúa en ${data.rsi}, indicando ${data.rsi < 30 ? 'sobreventa' : data.rsi > 70 ? 'sobrecompra' : 'equilibrio'}.
-
-  La señal actual es ${data.signal} con un nivel de riesgo ${data.risk.toLowerCase()}.
-
-  Soporte principal: ${data.support}
-  Resistencia principal: ${data.resistance}
-
-  La IA estima una probabilidad de movimiento del ${data.probability}.
-
-  Recomendación profesional:
-
-  ${recommendation}.
-  `;
-
-  document.getElementById('aiAnalysis').innerText = analysis;
-
-  const signalElement = document.getElementById('signal');
-
-  signalElement.className = 'text-4xl font-black pulse';
-
-  if (data.signal === 'COMPRAR') {
-    signalElement.classList.add('buy');
-  }
-
-  if (data.signal === 'VENDER') {
-    signalElement.classList.add('sell');
-  }
-
-  if (data.signal === 'ESPERAR') {
-    signalElement.classList.add('neutral');
-  }
-}
-
-let currentInterval = '60';
-let currentSymbol = 'BINANCE:BTCUSDT';
-
-function loadTradingView(symbol = 'BINANCE:BTCUSDT', interval = '60') {
-
-  currentSymbol = symbol;
-  currentInterval = interval;
-
-  const container = document.getElementById('tradingview_widget');
-
-  if (!container) {
-    console.error('Contenedor TradingView no encontrado');
-    return;
-  }
-
-  container.innerHTML = '';
-
-  if (typeof TradingView === 'undefined') {
-    container.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100%;font-size:24px;color:white;">Error cargando TradingView</div>';
-    return;
-  }
-
-  new TradingView.widget({
-    autosize: true,
-    symbol: symbol,
-    interval: interval,
-    timezone: 'Etc/UTC',
-    theme: 'dark',
-    style: '1',
-    locale: 'es',
-    toolbar_bg: '#050816',
-    enable_publishing: false,
-    allow_symbol_change: true,
-    withdateranges: true,
-    hide_side_toolbar: false,
-    details: true,
-    hotlist: true,
-    calendar: true,
-    studies: [
-      'RSI@tv-basicstudies',
-      'MACD@tv-basicstudies'
-    ],
-    container_id: 'tradingview_widget'
-  });
-}
-
-function updateTradingViewSymbol() {
-
-  const symbol = document.getElementById('marketSelect').value;
-
-  const mapping = {
-    BTCUSDT: 'BINANCE:BTCUSDT',
-    ETHUSDT: 'BINANCE:ETHUSDT',
-    SOLUSDT: 'BINANCE:SOLUSDT',
-    XRPUSDT: 'BINANCE:XRPUSDT',
-    ADAUSDT: 'BINANCE:ADAUSDT',
-    BNBUSDT: 'BINANCE:BNBUSDT',
-    DOGEUSDT: 'BINANCE:DOGEUSDT',
-    AVAXUSDT: 'BINANCE:AVAXUSDT',
-    LINKUSDT: 'BINANCE:LINKUSDT',
-    EURUSD: 'FX:EURUSD',
-    GBPUSD: 'FX:GBPUSD',
-    NASDAQ: 'NASDAQ:NDX',
-    SP500: 'SP:SPX',
-    ORO: 'TVC:GOLD',
-    AAPL: 'NASDAQ:AAPL',
-    TSLA: 'NASDAQ:TSLA',
-    NVDA: 'NASDAQ:NVDA'
-  };
-
-  const tvSymbol = mapping[symbol] || 'BINANCE:BTCUSDT';
-
-  loadTradingView(tvSymbol, currentInterval);
-}
-
-function changeInterval(interval, buttonElement) {
-
-  currentInterval = interval;
-
-  const buttons = document.querySelectorAll('.interval-btn');
-
-  buttons.forEach(btn => {
-    btn.classList.remove('bg-blue-600', 'border-blue-400', 'glow');
-    btn.classList.add('bg-black/40', 'border-white/10');
-  });
-
-  if (buttonElement) {
-    buttonElement.classList.remove('bg-black/40', 'border-white/10');
-    buttonElement.classList.add('bg-blue-600', 'border-blue-400', 'glow');
-  }
-
-  updateTradingViewSymbol();
-}
-
-function analyzeMarket() {
-
-  updateTradingViewSymbol();
-
-  const data = generateFakeMarketData();
-
-  updateUI(data);
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-
-  analyzeMarket();
-
-  setInterval(() => {
-    analyzeMarket();
-  }, 5000);
-
-});
-
-</script>
-
 </div>
 
 <script>
-
-function openTerminal() {
-  document.getElementById('welcomeScreen').classList.add('hidden');
-  document.getElementById('terminalScreen').classList.remove('hidden');
-}
-
-function openAITrading() {
-  document.getElementById('welcomeScreen').classList.add('hidden');
-  document.getElementById('aiTradingScreen').classList.remove('hidden');
-}
-
-function backToHome() {
-  document.getElementById('welcomeScreen').classList.remove('hidden');
-  document.getElementById('terminalScreen').classList.add('hidden');
-  document.getElementById('aiTradingScreen').classList.add('hidden');
-}
-
-function sendAIMessage() {
-
-  const input = document.getElementById('aiInput');
-  const chat = document.getElementById('chatMessages');
-
-  const message = input.value.trim();
-
-  if (!message) {
-    return;
-  }
-
-  const userMessage = document.createElement('div');
-  userMessage.className = 'bg-white/5 border border-white/10 rounded-2xl p-5';
-  userMessage.innerHTML = `
-    <p class="text-blue-400 font-bold mb-2">Tú</p>
-    <p class="text-gray-300 leading-8">${message}</p>
-  `;
-
-  chat.appendChild(userMessage);
-
-  const responses = [
-    'El mercado actualmente mantiene una estructura alcista con posible continuación de tendencia si Bitcoin mantiene soporte institucional.',
-    'El RSI muestra fuerza compradora moderada. Podría haber continuación alcista a corto plazo.',
-    'Ethereum presenta una zona importante de liquidez institucional cerca de resistencia.',
-    'La volatilidad actual del mercado es elevada. Se recomienda gestión de riesgo conservadora.',
-    'Los datos macroeconómicos favorecen actualmente los activos de riesgo como tecnología y criptomonedas.',
-    'La IA detecta posible acumulación institucional en marcos temporales altos.'
-  ];
-
-  const aiMessage = document.createElement('div');
-  aiMessage.className = 'bg-purple-500/10 border border-purple-500/20 rounded-2xl p-5';
-
-  const response = responses[Math.floor(Math.random() * responses.length)];
-
-  aiMessage.innerHTML = `
-    <p class="text-purple-400 font-bold mb-2">IA Trading</p>
-    <p class="text-gray-300 leading-8">${response}</p>
-  `;
-
-  setTimeout(() => {
-    chat.appendChild(aiMessage);
-    chat.scrollTop = chat.scrollHeight;
-  }, 800);
-
-  input.value = '';
-}
-
+let marketData={},currentSymbol='BTCUSDT',currentTF='1m',chart=null,candleSeries=null,emaSeries20=null,emaSeries50=null,wsConnection=null,fngData=null,chatHistory=[],isStreaming=false;
+function showSection(id,tabEl){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.getElementById('section-'+id).classList.add('active');if(tabEl)tabEl.classList.add('active');if(id==='terminal'&&!chart)initChart();}
+const fmt=(n,d=2)=>n==null?'—':new Intl.NumberFormat('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
+const fmtBig=n=>!n?'—':n>1e12?'$'+(n/1e12).toFixed(2)+'T':n>1e9?'$'+(n/1e9).toFixed(2)+'B':n>1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+fmt(n);
+const fmtPrice=n=>!n?'—':n>1000?'$'+fmt(n,0):n>1?'$'+fmt(n,2):'$'+fmt(n,4);
+function setChg(el,v){if(!el)return;if(v==null){el.textContent='—';return;}el.textContent=(v>=0?'+':'')+v.toFixed(2)+'%';el.className='card-chg '+(v>=0?'up':'down');}
+const COINS=[{id:'bitcoin',sym:'BTC',name:'Bitcoin'},{id:'ethereum',sym:'ETH',name:'Ethereum'},{id:'solana',sym:'SOL',name:'Solana'},{id:'ripple',sym:'XRP',name:'XRP'},{id:'binancecoin',sym:'BNB',name:'BNB'},{id:'cardano',sym:'ADA',name:'Cardano'}];
+async function fetchPrices(){try{const ids=COINS.map(c=>c.id).join(',');const r=await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids='+ids+'&order=market_cap_desc&per_page=10&page=1&sparkline=false&price_change_percentage=24h');const data=await r.json();if(!Array.isArray(data))return;data.forEach(d=>{marketData[d.symbol.toUpperCase()]=d;});updatePriceUI();updateTicker();updateSignals();document.getElementById('last-update').textContent=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}catch(e){}}
+async function fetchGlobal(){try{const r=await fetch('https://api.coingecko.com/api/v3/global');const{data:d}=await r.json();document.getElementById('btc-dom').textContent=d.market_cap_percentage.btc.toFixed(1)+'%';document.getElementById('total-cap').textContent='Cap: '+fmtBig(d.total_market_cap.usd);}catch(e){}}
+async function fetchFearGreed(){try{const r=await fetch('https://api.alternative.me/fng/?limit=1');const data=await r.json();fngData=data.data[0];const val=parseInt(fngData.value);document.getElementById('fng-num').textContent=val;document.getElementById('fng-txt').textContent=fngData.value_classification;document.getElementById('fng-num').style.color=val>60?'var(--up)':val<40?'var(--down)':'var(--warn)';}catch(e){}}
+function updatePriceUI(){const btc=marketData['BTC'],eth=marketData['ETH'];if(btc){document.getElementById('btc-price').textContent=fmtPrice(btc.current_price);setChg(document.getElementById('btc-chg'),btc.price_change_percentage_24h);document.getElementById('btc-cap').textContent='Cap: '+fmtBig(btc.market_cap);}if(eth){document.getElementById('eth-price').textContent=fmtPrice(eth.current_price);setChg(document.getElementById('eth-chg'),eth.price_change_percentage_24h);document.getElementById('eth-cap').textContent='Cap: '+fmtBig(eth.market_cap);}const grid=document.getElementById('market-big-grid');grid.innerHTML='';COINS.slice(0,6).forEach(c=>{const d=marketData[c.sym];if(!d)return;const chg=d.price_change_percentage_24h;const div=document.createElement('div');div.className='card market-big';div.onclick=()=>selectMarketSymbol(c.sym+'USDT');div.innerHTML='<div class="card-header">'+c.name+' ('+c.sym+')</div><div class="card-value">'+fmtPrice(d.current_price)+'</div><div class="card-chg '+(chg>=0?'up':'down')+'">'+(chg>=0?'+':'')+chg?.toFixed(2)+'%</div><div class="card-sub">Vol: '+fmtBig(d.total_volume)+'</div>';grid.appendChild(div);});}
+function selectMarketSymbol(sym){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.getElementById('section-terminal').classList.add('active');document.querySelectorAll('.nav-tab')[1].classList.add('active');setTimeout(()=>{if(!chart)initChart();loadSymbol(sym.toUpperCase());},100);}
+function updateTicker(){const coins=Object.values(marketData);const all=[...coins,...coins];document.getElementById('ticker-track').innerHTML=all.map(d=>{if(!d)return'';const chg=d.price_change_percentage_24h;return'<div class="ticker-item"><span class="ticker-sym">'+d.symbol?.toUpperCase()+'</span><span class="ticker-price">'+fmtPrice(d.current_price)+'</span><span class="ticker-chg '+(chg>=0?'up':'down')+'">'+(chg>=0?'+':'')+chg?.toFixed(2)+'%</span></div>';}).join('');}
+function updateSignals(){const el=document.getElementById('signals-container');const btc=marketData['BTC'],eth=marketData['ETH'],sol=marketData['SOL'];if(!btc)return;const signals=[];const btcChg=btc.price_change_percentage_24h;const fngVal=fngData?parseInt(fngData.value):50;if(btcChg>3)signals.push({sym:'BTC/USDT',type:'buy',desc:'Momentum alcista fuerte (+'+btcChg.toFixed(2)+'% 24h). Considerar entrada en pullbacks.'});else if(btcChg<-3)signals.push({sym:'BTC/USDT',type:'sell',desc:'Presión bajista ('+btcChg.toFixed(2)+'% 24h). Esperar soporte antes de entrar.'});else signals.push({sym:'BTC/USDT',type:'neutral',desc:'Mercado en consolidación ('+btcChg.toFixed(2)+'% 24h). Esperar ruptura de rango.'});if(eth){const ethChg=eth.price_change_percentage_24h;if(ethChg>4)signals.push({sym:'ETH/USDT',type:'buy',desc:'ETH superando a BTC (+'+ethChg.toFixed(2)+'%). Posible rotación hacia alts.'});else if(ethChg<-4)signals.push({sym:'ETH/USDT',type:'sell',desc:'ETH bajo presión ('+ethChg.toFixed(2)+'%). Correlación bajista con BTC.'});}if(fngVal>75)signals.push({sym:'MERCADO',type:'sell',desc:'Codicia extrema (F&G: '+fngVal+'). Considerar reducir exposición.'});else if(fngVal<25)signals.push({sym:'MERCADO',type:'buy',desc:'Miedo extremo (F&G: '+fngVal+'). Zonas históricas de acumulación.'});const now=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});el.innerHTML=signals.map(s=>'<div class="signal-card"><div class="signal-badge '+s.type+'">'+(s.type==='buy'?'COMPRA':s.type==='sell'?'VENTA':'NEUTRAL')+'</div><div><div class="signal-sym">'+s.sym+'</div><div class="signal-desc">'+s.desc+'</div><div class="signal-time">'+now+'</div></div></div>').join('');}
+const SYMBOLS=['BTCUSDT','ETHUSDT','SOLUSDT','XRPUSDT','BNBUSDT','ADAUSDT','DOGEUSDT','AVAXUSDT'];
+function initChart(){const container=document.getElementById('chart-container');chart=LightweightCharts.createChart(container,{width:container.clientWidth,height:300,layout:{background:{color:'#0d1117'},textColor:'#6b8099'},grid:{vertLines:{color:'#1e2d3d'},horzLines:{color:'#1e2d3d'}},crosshair:{mode:LightweightCharts.CrosshairMode.Normal},rightPriceScale:{borderColor:'#1e2d3d'},timeScale:{borderColor:'#1e2d3d',timeVisible:true,secondsVisible:false},handleScroll:{vertTouchDrag:false},handleScale:{pinch:true,axisPressedMouseMove:false}});candleSeries=chart.addCandlestickSeries({upColor:'#00c97a',downColor:'#ff4d5a',borderUpColor:'#00c97a',borderDownColor:'#ff4d5a',wickUpColor:'#00c97a',wickDownColor:'#ff4d5a'});emaSeries20=chart.addLineSeries({color:'#0095ff',lineWidth:1,priceLineVisible:false});emaSeries50=chart.addLineSeries({color:'#f5a623',lineWidth:1,priceLineVisible:false});chart.subscribeCrosshairMove(p=>{if(!p.seriesData?.size)return;const c=p.seriesData.get(candleSeries);if(c)document.getElementById('chart-ohlc').textContent='O '+fmtPrice(c.open)+'  H '+fmtPrice(c.high)+'  L '+fmtPrice(c.low)+'  C '+fmtPrice(c.close);});const grid=document.getElementById('sym-grid');SYMBOLS.forEach(s=>{const b=document.createElement('button');b.className='sym-btn'+(s===currentSymbol?' active':'');b.textContent=s.replace('USDT','');b.onclick=()=>loadSymbol(s);grid.appendChild(b);});window.addEventListener('resize',()=>{if(chart)chart.applyOptions({width:container.clientWidth});});loadSymbol(currentSymbol);}
+async function loadSymbol(sym){currentSymbol=sym;document.querySelectorAll('.sym-btn').forEach(b=>b.classList.toggle('active',b.textContent===sym.replace('USDT','')));document.getElementById('chart-title').textContent=sym.replace('USDT','/USDT');await loadCandles();connectWS();}
+async function loadCandles(){try{const r=await fetch('https://api.binance.com/api/v3/klines?symbol='+currentSymbol+'&interval='+currentTF+'&limit=300');const raw=await r.json();if(!Array.isArray(raw))return;const candles=raw.map(k=>({time:Math.floor(k[0]/1000),open:parseFloat(k[1]),high:parseFloat(k[2]),low:parseFloat(k[3]),close:parseFloat(k[4])}));candleSeries.setData(candles);const closes=candles.map(c=>c.close);const ema20=calcEMA(closes,20),ema50=calcEMA(closes,50);emaSeries20.setData(candles.slice(candles.length-ema20.length).map((c,i)=>({time:c.time,value:ema20[i]})));emaSeries50.setData(candles.slice(candles.length-ema50.length).map((c,i)=>({time:c.time,value:ema50[i]})));const last=candles[candles.length-1];const lp=document.getElementById('chart-live-price');lp.textContent=fmtPrice(last.close);lp.style.color=last.close>=last.open?'var(--up)':'var(--down)';const rsi=calcRSI(closes,14),rsiVal=rsi[rsi.length-1];const rsiEl=document.getElementById('ind-rsi');rsiEl.textContent=rsiVal?.toFixed(1);rsiEl.style.color=rsiVal>70?'var(--down)':rsiVal<30?'var(--up)':'var(--text)';const macd=calcMACD(closes);const mEl=document.getElementById('ind-macd');mEl.textContent=macd.histogram?.toFixed(4);mEl.style.color=macd.histogram>0?'var(--up)':'var(--down)';document.getElementById('ind-ema20').textContent=fmtPrice(ema20[ema20.length-1]);document.getElementById('ind-ema50').textContent=fmtPrice(ema50[ema50.length-1]);const lows=candles.slice(-20).map(c=>c.low),highs=candles.slice(-20).map(c=>c.high);document.getElementById('ind-sup').textContent=fmtPrice(Math.min(...lows));document.getElementById('ind-res').textContent=fmtPrice(Math.max(...highs));chart.timeScale().fitContent();}catch(e){}}
+function connectWS(){if(wsConnection)wsConnection.close();wsConnection=new WebSocket('wss://stream.binance.com:9443/ws/'+currentSymbol.toLowerCase()+'@kline_'+currentTF);wsConnection.onmessage=e=>{const{k}=JSON.parse(e.data);if(!k)return;const candle={time:Math.floor(k.t/1000),open:parseFloat(k.o),high:parseFloat(k.h),low:parseFloat(k.l),close:parseFloat(k.c)};candleSeries.update(candle);const lp=document.getElementById('chart-live-price');lp.textContent=fmtPrice(candle.close);lp.style.color=candle.close>=candle.open?'var(--up)':'var(--down)';}}
+function setTF(btn,tf){document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');currentTF=tf;loadCandles();if(wsConnection){wsConnection.close();connectWS();}}
+function calcEMA(closes,period){const k=2/(period+1);const emas=[closes[0]];for(let i=1;i<closes.length;i++)emas.push(closes[i]*k+emas[i-1]*(1-k));return emas.slice(period-1);}
+function calcRSI(closes,period){const gains=[],losses=[];for(let i=1;i<closes.length;i++){const d=closes[i]-closes[i-1];gains.push(d>0?d:0);losses.push(d<0?-d:0);}let avgG=gains.slice(0,period).reduce((a,b)=>a+b,0)/period;let avgL=losses.slice(0,period).reduce((a,b)=>a+b,0)/period;const rsis=[];for(let i=period;i<gains.length;i++){avgG=(avgG*(period-1)+gains[i])/period;avgL=(avgL*(period-1)+losses[i])/period;rsis.push(avgL===0?100:100-(100/(1+avgG/avgL)));}return rsis;}
+function calcMACD(closes,fast=12,slow=26,signal=9){const emaFast=calcEMA(closes,fast),emaSlow=calcEMA(closes,slow);const diff=slow-fast;const macdLine=emaSlow.map((v,i)=>emaFast[i+diff]-v);const sigLine=calcEMA(macdLine,signal);return{macd:macdLine[macdLine.length-1],signal:sigLine[sigLine.length-1],histogram:macdLine[macdLine.length-1]-sigLine[sigLine.length-1]};}
+function buildSystemPrompt(){const now=new Date().toLocaleString('es-ES');let ctx='DATOS DE MERCADO EN TIEMPO REAL ('+now+'):\n';COINS.forEach(c=>{const d=marketData[c.sym];if(d)ctx+='- '+c.sym+': '+fmtPrice(d.current_price)+' ('+d.price_change_percentage_24h?.toFixed(2)+'% 24h) | Cap: '+fmtBig(d.market_cap)+'\n';});if(fngData)ctx+='- Índice Miedo y Codicia: '+fngData.value+'/100 ('+fngData.value_classification+')\n';return'Eres un analista institucional de mercados y criptomonedas de élite. Tienes acceso a datos de mercado en tiempo real.\n\n'+ctx+'\n\nINSTRUCCIONES:\n- Responde SIEMPRE en español\n- Usa los datos de mercado reales de arriba\n- Sé concreto: incluye precios exactos de soporte, resistencia, entrada, stop-loss y take-profit\n- Usa **negrita** para datos clave\n- Secciones claras (📊 Análisis, ⚠️ Riesgos, 🎯 Niveles Clave)\n- 150-300 palabras\n- Siempre menciona gestión de riesgo\n- NUNCA des consejos como recomendaciones absolutas';}
+function renderMarkdown(text){return text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`(.*?)`/g,'<code>$1</code>').replace(/^### (.*)/gm,'<strong style="font-size:11px;color:var(--accent2);text-transform:uppercase;letter-spacing:.08em">$1</strong>').replace(/^## (.*)/gm,'<strong style="font-size:12px;color:var(--accent)">$1</strong>').replace(/^- (.*)/gm,'<li>$1</li>').replace(/(<li>.*<\/li>\n?)+/g,m=>'<ul>'+m+'</ul>').replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');}
+async function sendChat(){const input=document.getElementById('chat-input');const text=input.value.trim();if(!text||isStreaming)return;input.value='';input.style.height='auto';addMsg('user',text);chatHistory.push({role:'user',content:text});const sendBtn=document.getElementById('chat-send');sendBtn.disabled=true;isStreaming=true;const msgs=document.getElementById('chat-messages');const aiDiv=document.createElement('div');aiDiv.className='msg ai fade-in';aiDiv.innerHTML='<div class="msg-icon">🤖</div><div class="msg-bubble stream-cursor" id="streaming-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';msgs.appendChild(aiDiv);msgs.scrollTop=msgs.scrollHeight;const bubble=document.getElementById('streaming-bubble');let fullText='';try{const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1024,stream:true,system:buildSystemPrompt(),messages:chatHistory.slice(-12)})});if(!resp.ok){const err=await resp.json();bubble.classList.remove('stream-cursor');bubble.innerHTML='❌ <strong>Error:</strong> '+(err.error?.message||'Error desconocido.');isStreaming=false;sendBtn.disabled=false;return;}const reader=resp.body.getReader();const decoder=new TextDecoder();bubble.innerHTML='';while(true){const{done,value}=await reader.read();if(done)break;const chunk=decoder.decode(value);const lines=chunk.split('\n');for(const line of lines){if(line.startsWith('data: ')){const data=line.slice(6);if(data==='[DONE]')continue;try{const parsed=JSON.parse(data);if(parsed.type==='content_block_delta'&&parsed.delta?.text){fullText+=parsed.delta.text;bubble.innerHTML=renderMarkdown(fullText);bubble.classList.add('stream-cursor');msgs.scrollTop=msgs.scrollHeight;}if(parsed.type==='message_stop')bubble.classList.remove('stream-cursor');}catch(e){}}}}bubble.classList.remove('stream-cursor');if(fullText)chatHistory.push({role:'assistant',content:fullText});else bubble.innerHTML='❌ Sin respuesta.';}catch(e){bubble.classList.remove('stream-cursor');bubble.innerHTML='❌ <strong>Error:</strong> '+e.message;}isStreaming=false;sendBtn.disabled=false;msgs.scrollTop=msgs.scrollHeight;}
+function addMsg(role,text){const msgs=document.getElementById('chat-messages');const div=document.createElement('div');div.className='msg '+role+' fade-in';div.innerHTML='<div class="msg-icon">'+(role==='ai'?'🤖':'👤')+'</div><div class="msg-bubble">'+renderMarkdown(text)+'</div>';msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;}
+function quickAsk(q){document.getElementById('chat-input').value=q;sendChat();}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
+document.getElementById('chat-input')?.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';});
+async function init(){await fetchPrices();fetchGlobal();fetchFearGreed();setInterval(fetchPrices,30000);setInterval(fetchGlobal,120000);setInterval(fetchFearGreed,300000);}
+init();
 </script>
-
 </body>
 </html>
